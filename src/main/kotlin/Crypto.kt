@@ -6,12 +6,14 @@ import javax.crypto.Cipher
 
 object Crypto {
     private const val KEY_ALGORITHM = "RSA"
-    private val cipher = Cipher.getInstance(KEY_ALGORITHM)
-    private val keyGen = KeyPairGenerator.getInstance(KEY_ALGORITHM).apply {
-        initialize(2048)
-    }
+    private const val SIGNATURE_ALGORITHM = "MD5withRSA"
+
+    private val signature: Signature = Signature.getInstance(SIGNATURE_ALGORITHM)
+    private val cipher: Cipher = Cipher.getInstance(KEY_ALGORITHM)
+    private val keyGen: KeyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM)
 
     fun generateKeyPair(): KeyPair {
+        keyGen.initialize(1024)
         return keyGen.genKeyPair()
     }
 
@@ -23,6 +25,18 @@ object Crypto {
     fun decrypt(text: ByteArray, key: PrivateKey): ByteArray {
         cipher.init(Cipher.DECRYPT_MODE, key)
         return cipher.doFinal(text)
+    }
+
+    fun sign(data: ByteArray, privateKey: ByteArray): ByteArray {
+        signature.initSign(Builder.buildPrivateKey(privateKey))
+        signature.update(data)
+        return Converter.toBase64(signature.sign())
+    }
+
+    fun verify(data: ByteArray, publicKey: ByteArray, sign: ByteArray): Boolean {
+        signature.initVerify(Builder.buildPublicKey(publicKey))
+        signature.update(data)
+        return signature.verify(Converter.fromBase64(sign))
     }
 
     object Converter {
