@@ -1,24 +1,48 @@
+import kotlinx.coroutines.coroutineScope
 import kotlin.system.measureTimeMillis
 
-fun main() {
-    val elapsed = measureTimeMillis {
-        val kp = Crypto.generateKeyPair()
+import com.tynkovski.cryptography.Crypto
 
-        val publicKey = kp.public
-        val publicKeyString = String(Crypto.Converter.toBase64(publicKey.encoded))
-        val secondPublicKey = Crypto.Builder.buildPublicKey(Crypto.Converter.fromBase64(publicKeyString.toByteArray()))
-        val secondPublicKeyString = String(Crypto.Converter.toBase64(secondPublicKey.encoded))
-
-        val privateKey = kp.private
-        val privateKeyString = String(Crypto.Converter.toBase64(privateKey.encoded))
-        val secondPrivateKey = Crypto.Builder.buildPrivateKey(Crypto.Converter.fromBase64(privateKeyString.toByteArray()))
-        val secondPrivateKeyString = String(Crypto.Converter.toBase64(secondPrivateKey.encoded))
-
-        println("Original: $publicKeyString")
-        println("Built   : $secondPublicKeyString")
-
-        println("Original: $privateKeyString")
-        println("Built   : $secondPrivateKeyString")
+data class Message(
+    var text: String,
+    val time: Long
+) {
+    companion object {
+        fun random(text: String): Message {
+            return Message(text, (0 until Long.MAX_VALUE).random())
+        }
     }
-    println(elapsed)
+}
+
+fun randomString(): String {
+    val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+    return (1..32)
+        .map { kotlin.random.Random.nextInt(0, charPool.size) }
+        .map(charPool::get)
+        .joinToString("")
+}
+
+fun main() {
+    val kp = Crypto.generateKeyPair()
+    val messages = arrayListOf<Message>()
+
+    repeat(10_000) {
+        messages.add(Message.random(randomString()))
+    }
+
+    val time1 = measureTimeMillis {
+        messages.forEach { message ->
+            message.text = Crypto.Converter.encryptToBase64String(message.text, kp.public)
+        }
+    }
+
+    println("$time1 ms")
+
+    val time2 = measureTimeMillis {
+        messages.forEach { message ->
+            message.text = Crypto.Converter.decryptFromBase64String(message.text, kp.private)
+        }
+    }
+
+    println("$time2 ms")
 }

@@ -1,3 +1,5 @@
+package com.tynkovski.cryptography
+
 import java.security.*
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
@@ -40,6 +42,14 @@ object Crypto {
     }
 
     object Converter {
+        fun encryptToBase64String(string: String, key: PublicKey): String {
+            return String(toBase64(encrypt(string.toByteArray(), key)))
+        }
+
+        fun decryptFromBase64String(string: String, key: PrivateKey): String {
+            return String(decrypt(fromBase64(string.toByteArray()), key))
+        }
+
         fun toBase64(byteArray: ByteArray): ByteArray {
             return Base64.getEncoder().encode(byteArray)
         }
