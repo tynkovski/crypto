@@ -1,4 +1,3 @@
-import kotlinx.coroutines.coroutineScope
 import kotlin.system.measureTimeMillis
 
 import com.tynkovski.cryptography.Crypto

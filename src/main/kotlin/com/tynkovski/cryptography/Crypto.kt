@@ -19,14 +19,14 @@ object Crypto {
         return keyGen.genKeyPair()
     }
 
-    fun encrypt(text: ByteArray, key: PublicKey): ByteArray {
+    fun encrypt(data: ByteArray, key: PublicKey): ByteArray {
         cipher.init(Cipher.ENCRYPT_MODE, key)
-        return cipher.doFinal(text)
+        return cipher.doFinal(data)
     }
 
-    fun decrypt(text: ByteArray, key: PrivateKey): ByteArray {
+    fun decrypt(data: ByteArray, key: PrivateKey): ByteArray {
         cipher.init(Cipher.DECRYPT_MODE, key)
-        return cipher.doFinal(text)
+        return cipher.doFinal(data)
     }
 
     fun sign(data: ByteArray, privateKey: ByteArray): ByteArray {
@@ -50,8 +50,8 @@ object Crypto {
             return String(decrypt(fromBase64(string.toByteArray()), key))
         }
 
-        fun toBase64(byteArray: ByteArray): ByteArray {
-            return Base64.getEncoder().encode(byteArray)
+        fun toBase64(data: ByteArray): ByteArray {
+            return Base64.getEncoder().encode(data)
         }
 
         fun fromBase64(base64: ByteArray): ByteArray {
@@ -60,6 +60,14 @@ object Crypto {
     }
 
     object Builder {
+        fun buildPrivateKey(stringInBase64: String): PrivateKey {
+            return buildPrivateKey(Converter.fromBase64(stringInBase64.toByteArray()))
+        }
+
+        fun buildPublicKey(stringInBase64: String): PublicKey {
+            return buildPublicKey(Converter.fromBase64(stringInBase64.toByteArray()))
+        }
+
         fun buildPrivateKey(byteArray: ByteArray): PrivateKey {
             val keySpec = PKCS8EncodedKeySpec(byteArray)
             val keyFactory = KeyFactory.getInstance(KEY_ALGORITHM)
