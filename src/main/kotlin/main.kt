@@ -1,15 +1,8 @@
 fun main() {
-    val keyPairAlice = Crypto.generateKeyPair()
-    val keyPairBob = Crypto.generateKeyPair()
-
-    println("Alice's public key: ${String(Crypto.Converter.toBase64(keyPairAlice.public.encoded))}")
-    println("Bob's public key: ${String(Crypto.Converter.toBase64(keyPairBob.public.encoded))}")
-
-    val bobMessage = Crypto.encrypt("Hello, Alice!".toByteArray(), keyPairAlice.public)
-    println("Message to Alice: ${String(bobMessage)}")
-    println("Alice reads: ${String(Crypto.decrypt(bobMessage, keyPairAlice.private))}")
-
-    val aliceMessage = Crypto.encrypt("Hello, Bob!".toByteArray(), keyPairBob.public)
-    println("Message to Bob: ${String(aliceMessage)}")
-    println("Bob reads: ${String(Crypto.decrypt(aliceMessage, keyPairBob.private))}")
+    val publicKey       = Crypto.generateKeyPair().public
+    val string          = String(Crypto.Converter.toBase64(publicKey.encoded))
+    val secondPublicKey = Crypto.Builder.buildPublicKey(Crypto.Converter.fromBase64(string.toByteArray()))
+    val secondString    = String(Crypto.Converter.toBase64(secondPublicKey.encoded))
+    println("Original: $string")
+    println("Built   : $secondString")
 }
