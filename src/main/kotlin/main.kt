@@ -34,7 +34,7 @@ fun main() {
     println(aesRaw)
 
     val (aesEncrypted, aesIv) = Crypto.AES.encryptToString(aesData, aesRaw)
-    println("${aesEncrypted}, $aesIv")
+    println("$aesEncrypted $aesIv")
 
     val aesDecrypted = Crypto.AES.decryptFromString(aesEncrypted, aesRaw, aesIv)
     println(aesDecrypted)

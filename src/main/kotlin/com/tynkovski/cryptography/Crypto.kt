@@ -17,6 +17,7 @@ object Crypto {
         private val keyGen: KeyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM)
 
         fun generateKey(): Key {
+            keyGen.init(256)
             return keyGen.generateKey()
         }
 
