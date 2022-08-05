@@ -5,6 +5,7 @@ import java.security.*
 import java.security.spec.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
@@ -19,14 +20,35 @@ object Crypto {
             return keyGen.generateKey()
         }
 
-        fun encrypt(data: ByteArray, key: Key): Pair<ByteArray, ByteArray> {
+        fun encrypt(data: ByteArray, key: SecretKey): Pair<ByteArray, ByteArray> {
             cipher.init(Cipher.ENCRYPT_MODE, key)
             return Pair(cipher.doFinal(data), cipher.iv)
         }
 
-        fun decrypt(data: ByteArray, key: Key, iv: ByteArray): ByteArray {
-            cipher.init(Cipher.DECRYPT_MODE, key, IvParameterSpec(iv))
+        fun decrypt(data: ByteArray, key: SecretKey, iv: IvParameterSpec): ByteArray {
+            cipher.init(Cipher.DECRYPT_MODE, key, iv)
             return cipher.doFinal(data)
+        }
+
+        fun encryptToString(string: String, key: SecretKey): Pair<String, String> {
+            val (encrypted, iv) = encrypt(string.toByteArray(), key)
+            return Pair(String(Converter.toBase64(encrypted)), String(Converter.toBase64(iv)))
+        }
+
+        fun decryptFromString(string: String, key: SecretKey, iv: ByteArray): String {
+            val decrypted = decrypt(Converter.fromBase64(string.toByteArray()), key, IvParameterSpec(iv))
+            return String(decrypted)
+        }
+
+        fun encryptToString(string: String, key: String): Pair<String, String> {
+            val secretKey = Builder.buildKey(key)
+            return encryptToString(string, secretKey)
+        }
+
+        fun decryptFromString(string: String, key: String, iv: String): String {
+            val ivSpec = Converter.fromBase64String(iv)
+            val secretKey = Builder.buildKey(key)
+            return decryptFromString(string, secretKey, ivSpec)
         }
     }
 
@@ -65,16 +87,6 @@ object Crypto {
             return signature.verify(Converter.fromBase64(sign))
         }
 
-        fun encryptToString(string: String, key: String): String {
-            val publicKey = Builder.buildPublicKey(key)
-            return encryptToString(string, publicKey)
-        }
-
-        fun decryptFromString(string: String, key: String): String {
-            val privateKey = Builder.buildPrivateKey(key)
-            return decryptFromString(string, privateKey)
-        }
-
         fun encryptToString(string: String, key: PublicKey): String {
             val encrypted = encrypt(string.toByteArray(), key)
             return String(Converter.toBase64(encrypted))
@@ -83,6 +95,16 @@ object Crypto {
         fun decryptFromString(string: String, key: PrivateKey): String {
             val decrypted = decrypt(Converter.fromBase64(string.toByteArray()), key)
             return String(decrypted)
+        }
+
+        fun encryptToString(string: String, key: String): String {
+            val publicKey = Builder.buildPublicKey(key)
+            return encryptToString(string, publicKey)
+        }
+
+        fun decryptFromString(string: String, key: String): String {
+            val privateKey = Builder.buildPrivateKey(key)
+            return decryptFromString(string, privateKey)
         }
     }
 
@@ -109,11 +131,11 @@ object Crypto {
     }
 
     object Builder {
-        fun buildKey(string: String): SecretKeySpec {
+        fun buildKey(string: String): SecretKey {
             return buildKey(Converter.fromBase64String(string))
         }
 
-        fun buildKey(byteArray: ByteArray): SecretKeySpec {
+        fun buildKey(byteArray: ByteArray): SecretKey {
             return SecretKeySpec(byteArray, AES.KEY_ALGORITHM)
         }
 

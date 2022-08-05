@@ -10,7 +10,7 @@ fun randomString(maxSize: Int): String {
 }
 
 fun main() {
-    val data = "Hello, World!"
+    val data = "Hello, RSA!"
     val key = Crypto.RSA.generateKeyPair()
 
     val public = Crypto.Converter.toBase64String(key.public.encoded)
@@ -20,21 +20,22 @@ fun main() {
 
     val private = Crypto.Converter.toBase64String(key.private.encoded)
     println(private)
+
     val decrypted = Crypto.RSA.decryptFromString(encrypted, private)
     println(decrypted)
 
     // --
+    println()
 
-    val data2 = "Hello, AES!"
-    val key2 = Crypto.AES.generateKey()
+    val aesData = "Hello, AES!"
+    val aesKey = Crypto.AES.generateKey()
 
-    val aesKeyString = Crypto.Converter.toBase64String(key2.encoded)
-    println(aesKeyString)
-    val builtKey = Crypto.Builder.buildKey(aesKeyString)
+    val aesRaw = Crypto.Converter.toBase64String(aesKey.encoded)
+    println(aesRaw)
 
-    val (encryptedAes, initVector) = Crypto.AES.encrypt(data2.toByteArray(), builtKey)
-    println(Crypto.Converter.toBase64String(encryptedAes))
+    val (aesEncrypted, aesIv) = Crypto.AES.encryptToString(aesData, aesRaw)
+    println("${aesEncrypted}, $aesIv")
 
-    val decryptedAes = Crypto.AES.decrypt(encryptedAes, key2, initVector)
-    println(String(decryptedAes))
+    val aesDecrypted = Crypto.AES.decryptFromString(aesEncrypted, aesRaw, aesIv)
+    println(aesDecrypted)
 }
