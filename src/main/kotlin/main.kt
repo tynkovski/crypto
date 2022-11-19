@@ -1,42 +1,32 @@
-import com.tynkovski.cryptography.Base64String
+import com.tynkovski.cryptography.AESFactory
 import com.tynkovski.cryptography.Crypto
+import com.tynkovski.cryptography.RSAFactory
+import java.security.Key
 import java.security.KeyPair
 
-fun randomString(maxSize: Int): String {
-    val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-    val size = (1..maxSize).random()
-    return (1..size)
-        .map { kotlin.random.Random.nextInt(0, charPool.size) }
-        .map(charPool::get)
-        .joinToString("")
-}
-
 data class Profile(
-    val keys: KeyPair = Crypto.RSA.generateKeyPair()
+    private val rsaKeys: KeyPair = Crypto.RSA.generateKeyPair(),
+    private val aesKey: Key = Crypto.AES.generateKey()
 ) {
-    val privateKey: ByteArray get() = keys.private.encoded
-    val publicKey: ByteArray get() = keys.public.encoded
+    val privateKey: ByteArray get() = rsaKeys.private.encoded
+    val publicKey: ByteArray get() = rsaKeys.public.encoded
+    val key: ByteArray get() = aesKey.encoded
 }
 
 fun main() {
     val user = Profile()
 
-    val message = "Hello"
+    val message = "Hello".toByteArray()
+    val a = RSAFactory.encrypt(message, user.publicKey)
+    val b = RSAFactory.decrypt(a, user.privateKey)
 
-    val encoded = Crypto.RSA.encrypt(message.toByteArray(), user.publicKey)
+    println(String(a))
+    println(String(b))
 
-    val encodedBase = Base64String.Builder()
-        .data(encoded)
-        .build()
-    println(encodedBase)
+    val message2 = "Should be encrypted".toByteArray()
+    val a2 = AESFactory.encrypt(message2, user.key)
+    val b2 = AESFactory.decrypt(a2.first, user.key, a2.second)
 
-    val messageBase = Base64String.Builder()
-        .encoded(true)
-        .data(encodedBase)
-        .decode()
-        .build()
-        .toByteArray()
-
-    val decoded = Crypto.RSA.decrypt(messageBase, user.privateKey)
-    println(String(decoded))
+    println(String(a2.first))
+    println(String(b2))
 }

@@ -1,6 +1,5 @@
 package com.tynkovski.cryptography
 
-import java.util.Base64
 import java.security.*
 import java.security.spec.*
 import javax.crypto.Cipher
@@ -29,18 +28,17 @@ object Crypto {
         fun encrypt(
             data: ByteArray,
             key: ByteArray,
-            iv: Boolean = true
         ): Pair<ByteArray, ByteArray> {
-            val cipher: Cipher = Cipher.getInstance(if (iv) KEY_TRANSFORMATION else KEY_ALGORITHM)
+            val cipher: Cipher = Cipher.getInstance(KEY_TRANSFORMATION)
             cipher.init(Cipher.ENCRYPT_MODE, Key.getInstance(key))
 
-            return Pair(cipher.doFinal(data), cipher.iv)
+            return Pair(cipher.doFinal(data), cipher.iv ?: ByteArray(16))
         }
 
         fun decrypt(
             data: ByteArray,
             key: ByteArray,
-            iv: ByteArray = ByteArray(16)
+            iv: ByteArray
         ): ByteArray {
             val cipher: Cipher = Cipher.getInstance(KEY_TRANSFORMATION)
             cipher.init(Cipher.DECRYPT_MODE, Key.getInstance(key), IvParameterSpec(iv))
@@ -119,62 +117,4 @@ object Crypto {
             return signature.verify(sign)
         }
     }
-}
-
-class Base64String {
-    companion object {
-        private val encoder = Base64.getEncoder()
-        private val decoder = Base64.getDecoder()
-    }
-
-    class Builder {
-        private var encode: Boolean = true
-        private var encoded: Boolean = false
-        private lateinit var data: ByteArray
-
-        fun encoded(encoded: Boolean): Builder {
-            this.encoded = encoded
-            return this
-        }
-
-        fun data(data: Base64String): Builder {
-            return data(data.toString())
-        }
-
-        fun data(data: String): Builder {
-            return data(data.toByteArray())
-        }
-
-        fun data(data: ByteArray): Builder {
-            this.data = data
-            return this
-        }
-
-        fun encode(): Builder {
-            this.encode = true
-            return this
-        }
-
-        fun decode(): Builder {
-            this.encode = false
-            return this
-        }
-
-        fun build(): Base64String {
-            return if (encoded) {
-                if (encode) Base64String(data) else Base64String(decoder.decode(data))
-            } else {
-                if (encode) Base64String(encoder.encode(data)) else Base64String(data)
-            }
-        }
-    }
-
-    private val data: ByteArray
-
-    private constructor(array: ByteArray) {
-        this.data = array
-    }
-
-    override fun toString() = String(data)
-    fun toByteArray() = data
 }
