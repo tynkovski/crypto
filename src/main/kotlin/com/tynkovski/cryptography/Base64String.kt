@@ -3,10 +3,8 @@ package com.tynkovski.cryptography
 import java.util.Base64
 
 class Base64String private constructor(
-    array: ByteArray
+    private val data: ByteArray
 ) {
-    private val data: ByteArray = array
-
     companion object {
         private val encoder = Base64.getEncoder()
         private val decoder = Base64.getDecoder()
