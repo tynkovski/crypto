@@ -1,4 +1,6 @@
+import com.tynkovski.cryptography.Base64String
 import com.tynkovski.cryptography.Crypto
+import java.security.KeyPair
 
 fun randomString(maxSize: Int): String {
     val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
@@ -9,33 +11,32 @@ fun randomString(maxSize: Int): String {
         .joinToString("")
 }
 
+data class Profile(
+    val keys: KeyPair = Crypto.RSA.generateKeyPair()
+) {
+    val privateKey: ByteArray get() = keys.private.encoded
+    val publicKey: ByteArray get() = keys.public.encoded
+}
+
 fun main() {
-    val data = "Hello, RSA!"
-    val key = Crypto.RSA.generateKeyPair()
+    val user = Profile()
 
-    val public = Crypto.Converter.toBase64String(key.public.encoded)
-    println(public)
-    val encrypted = Crypto.RSA.encryptToString(data, public)
-    println(encrypted)
+    val message = "Hello"
 
-    val private = Crypto.Converter.toBase64String(key.private.encoded)
-    println(private)
+    val encoded = Crypto.RSA.encrypt(message.toByteArray(), user.publicKey)
 
-    val decrypted = Crypto.RSA.decryptFromString(encrypted, private)
-    println(decrypted)
+    val encodedBase = Base64String.Builder()
+        .data(encoded)
+        .build()
+    println(encodedBase)
 
-    // --
-    println()
+    val messageBase = Base64String.Builder()
+        .encoded(true)
+        .data(encodedBase)
+        .decode()
+        .build()
+        .toByteArray()
 
-    val aesData = "Hello, AES!"
-    val aesKey = Crypto.AES.generateKey()
-
-    val aesRaw = Crypto.Converter.toBase64String(aesKey.encoded)
-    println(aesRaw)
-
-    val (aesEncrypted, aesIv) = Crypto.AES.encryptToString(aesData, aesRaw)
-    println("$aesEncrypted $aesIv")
-
-    val aesDecrypted = Crypto.AES.decryptFromString(aesEncrypted, aesRaw, aesIv)
-    println(aesDecrypted)
+    val decoded = Crypto.RSA.decrypt(messageBase, user.privateKey)
+    println(String(decoded))
 }
