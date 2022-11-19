@@ -6,6 +6,22 @@ abstract class CryptoFactory {
 
 object AESFactory : CryptoFactory() {
     fun encrypt(
+        data: String,
+        key: String
+    ): Pair<String, String> {
+        val (encrypted, iv) = encrypt(data.toByteArray(), key.toByteArray())
+        return Pair(String(encrypted), String(iv))
+    }
+
+    fun decrypt(
+        data: String,
+        key: String,
+        iv: String
+    ): String {
+        return String(decrypt(data.toByteArray(), key.toByteArray(), iv.toByteArray()))
+    }
+
+    fun encrypt(
         data: ByteArray,
         key: ByteArray,
     ): Pair<ByteArray, ByteArray> {
@@ -30,6 +46,21 @@ object AESFactory : CryptoFactory() {
 }
 
 object RSAFactory : CryptoFactory() {
+    fun encrypt(
+        data: String,
+        key: String
+    ): String {
+        return String(encrypt(data.toByteArray(), key.toByteArray()))
+    }
+
+    fun decrypt(
+        data: String,
+        key: String,
+    ): String {
+        val decrypted = decrypt(data.toByteArray(), key.toByteArray())
+        return String(decrypted)
+    }
+
     fun encrypt(
         data: ByteArray,
         key: ByteArray,
