@@ -9,8 +9,11 @@ object AESFactory : CryptoFactory() {
         data: ByteArray,
         key: ByteArray,
     ): Pair<ByteArray, ByteArray> {
-        val (encrypted, iv) = Crypto.AES.encrypt(data, key)
-        return Pair(converter.convertToBase64(encrypted), iv)
+        val (encrypted, iv) = Crypto.AES.encrypt(data, converter.convertFromBase64(key))
+        return Pair(
+            converter.convertToBase64(encrypted),
+            converter.convertToBase64(iv)
+        )
     }
 
     fun decrypt(
@@ -18,7 +21,11 @@ object AESFactory : CryptoFactory() {
         key: ByteArray,
         iv: ByteArray
     ): ByteArray {
-        return Crypto.AES.decrypt(converter.convertFromBase64(data), key, iv)
+        return Crypto.AES.decrypt(
+            converter.convertFromBase64(data),
+            converter.convertFromBase64(key),
+            converter.convertFromBase64(iv)
+        )
     }
 }
 
@@ -27,7 +34,7 @@ object RSAFactory : CryptoFactory() {
         data: ByteArray,
         key: ByteArray,
     ): ByteArray {
-        val encrypted = Crypto.RSA.encrypt(data, key)
+        val encrypted = Crypto.RSA.encrypt(data, converter.convertFromBase64(key))
         return converter.convertToBase64(encrypted)
     }
 
@@ -36,6 +43,6 @@ object RSAFactory : CryptoFactory() {
         key: ByteArray,
     ): ByteArray {
         val raw = converter.convertFromBase64(data)
-        return Crypto.RSA.decrypt(raw, key)
+        return Crypto.RSA.decrypt(raw, converter.convertFromBase64(key))
     }
 }
