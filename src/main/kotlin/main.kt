@@ -1,7 +1,7 @@
 import com.tynkovski.cryptography.AESFactory
 import com.tynkovski.cryptography.Base64Converter
 import com.tynkovski.cryptography.Crypto
-import com.tynkovski.cryptography.RSAFactory
+import java.io.File
 import java.security.Key
 import java.security.KeyPair
 
@@ -24,23 +24,26 @@ class Profile(
     }
 }
 
+fun saveFile(path: String, fileName: String, array: ByteArray) {
+    File("$path//$fileName").writeBytes(array)
+}
+
+fun openFile(path: String, fileName: String): ByteArray {
+    return File("$path//$fileName").readBytes()
+}
+
+fun getResource(path: String): ByteArray? =
+    object {}.javaClass.getResource(path)?.readBytes()
+
 fun main() {
     val user = Profile()
     println("    key: ${String(user.key)}")
-    println("private: ${String(user.privateKey)}")
-    println(" public: ${String(user.publicKey)}")
 
-    val message = "Hello".toByteArray()
-    val a = RSAFactory.encrypt(message, user.publicKey)
-    val b = RSAFactory.decrypt(a, user.privateKey)
+    val originalPhoto = openFile(File("images/").absolutePath, "original.jpg")
+    val (encrypted, iv) = AESFactory.encrypt(originalPhoto, user.key)
+    saveFile(File("images/").absolutePath, "encrypted.txt", encrypted)
 
-    println(String(a))
-    println(String(b))
-
-    val message2 = "Should be encrypted".toByteArray()
-    val a2 = AESFactory.encrypt(message2, user.key)
-    val b2 = AESFactory.decrypt(a2.first, user.key, a2.second)
-
-    println(String(a2.first))
-    println(String(b2))
+    val encryptedPhoto = openFile(File("images/").absolutePath, "encrypted.txt")
+    val decrypted = AESFactory.decrypt(encryptedPhoto, user.key, iv)
+    saveFile(File("images/").absolutePath, "decrypted.jpg", decrypted)
 }
