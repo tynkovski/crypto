@@ -18,7 +18,8 @@ object AESFactory : CryptoFactory() {
         key: String,
         iv: String
     ): String {
-        return String(decrypt(data.toByteArray(), key.toByteArray(), iv.toByteArray()))
+        val decrypted = decrypt(data.toByteArray(), key.toByteArray(), iv.toByteArray())
+        return String(decrypted)
     }
 
     fun encrypt(
@@ -50,7 +51,8 @@ object RSAFactory : CryptoFactory() {
         data: String,
         key: String
     ): String {
-        return String(encrypt(data.toByteArray(), key.toByteArray()))
+        val encrypted = encrypt(data.toByteArray(), key.toByteArray())
+        return String(encrypted)
     }
 
     fun decrypt(
