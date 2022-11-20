@@ -6,8 +6,8 @@ class Base64String private constructor(
     private val data: ByteArray
 ) {
     companion object {
-        private val encoder = Base64.getEncoder()
-        private val decoder = Base64.getDecoder()
+        private val encoder by lazy { Base64.getEncoder() }
+        private val decoder by lazy { Base64.getDecoder() }
     }
 
     class Builder {

@@ -1,7 +1,7 @@
 package com.tynkovski.cryptography
 
 abstract class CryptoFactory {
-    protected val converter = Base64Converter()
+    protected val converter by lazy { Base64Converter() }
 }
 
 object AESFactory : CryptoFactory() {
