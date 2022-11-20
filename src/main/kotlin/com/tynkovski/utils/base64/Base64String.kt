@@ -1,4 +1,4 @@
-package com.tynkovski.cryptography
+package com.tynkovski.utils.base64
 
 import java.util.Base64
 

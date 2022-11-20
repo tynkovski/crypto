@@ -1,4 +1,4 @@
-package com.tynkovski.cryptography
+package com.tynkovski.utils.base64
 
 class Base64Converter {
     fun convertToBase64(data: ByteArray): ByteArray {

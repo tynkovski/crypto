@@ -1,3 +1,5 @@
+package com.tynkovski.utils.extentions
+
 fun String.Companion.random(range: IntRange): String {
     val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
     val size = range.random()

@@ -1,4 +1,4 @@
-package com.tynkovski.cryptography
+package com.tynkovski.utils.cryptography
 
 import java.security.*
 import java.security.spec.*
@@ -11,7 +11,7 @@ object Crypto {
     object AES {
         private object Key {
             fun getInstance(byteArray: ByteArray): java.security.Key {
-                return SecretKeySpec(byteArray, AES.KEY_ALGORITHM)
+                return SecretKeySpec(byteArray, KEY_ALGORITHM)
             }
         }
 
@@ -51,14 +51,14 @@ object Crypto {
         private object Key {
             fun getPrivateInstance(privateKey: ByteArray): PrivateKey {
                 val keySpec = PKCS8EncodedKeySpec(privateKey)
-                val keyFactory = KeyFactory.getInstance(RSA.KEY_ALGORITHM)
+                val keyFactory = KeyFactory.getInstance(KEY_ALGORITHM)
 
                 return keyFactory.generatePrivate(keySpec)
             }
 
             fun getPublicInstance(publicKey: ByteArray): PublicKey {
                 val keySpec = X509EncodedKeySpec(publicKey)
-                val keyFactory = KeyFactory.getInstance(RSA.KEY_ALGORITHM)
+                val keyFactory = KeyFactory.getInstance(KEY_ALGORITHM)
 
                 return keyFactory.generatePublic(keySpec)
             }

@@ -1,4 +1,6 @@
-package com.tynkovski.cryptography
+package com.tynkovski.utils.cryptography
+
+import com.tynkovski.utils.base64.Base64Converter
 
 abstract class CryptoFactory {
     protected val converter by lazy { Base64Converter() }
