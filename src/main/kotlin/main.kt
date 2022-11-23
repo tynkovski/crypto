@@ -2,10 +2,7 @@ import com.tynkovski.utils.archiver.Archiver
 import com.tynkovski.utils.extentions.times
 
 fun main() {
-    val data = (listOf(
-        "a"
-    ) * 1000).joinToString("")
-
+    val data = "a" * 100
     println(data)
 
     val archived = Archiver.zip(data.toByteArray())
