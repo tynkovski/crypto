@@ -1,13 +1,18 @@
 package com.tynkovski.utils.cryptography
 
-import java.security.*
-import java.security.spec.*
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
+import java.security.Signature
+import java.security.KeyFactory
+import java.security.KeyPair
+import java.security.KeyPairGenerator
+import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.X509EncodedKeySpec
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
 
 object Crypto {
+
     object AES {
         private object Key {
             fun getInstance(byteArray: ByteArray): java.security.Key {
@@ -48,15 +53,16 @@ object Crypto {
     }
 
     object RSA {
+
         private object Key {
-            fun getPrivateInstance(privateKey: ByteArray): PrivateKey {
+            fun getPrivateInstance(privateKey: ByteArray): java.security.PrivateKey {
                 val keySpec = PKCS8EncodedKeySpec(privateKey)
                 val keyFactory = KeyFactory.getInstance(KEY_ALGORITHM)
 
                 return keyFactory.generatePrivate(keySpec)
             }
 
-            fun getPublicInstance(publicKey: ByteArray): PublicKey {
+            fun getPublicInstance(publicKey: ByteArray): java.security.PublicKey {
                 val keySpec = X509EncodedKeySpec(publicKey)
                 val keyFactory = KeyFactory.getInstance(KEY_ALGORITHM)
 

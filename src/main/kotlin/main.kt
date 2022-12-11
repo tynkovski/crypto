@@ -1,15 +1,13 @@
 import com.tynkovski.utils.archiver.Archiver
-import com.tynkovski.utils.extentions.times
+import com.tynkovski.utils.cryptography.factory.AESFactory
 
 fun main() {
-    val data = "a" * 100
-    println(data)
+    val data = "Hello World!"
+    val key = AESFactory.generateKey()
+    val (encrypted, iv) = AESFactory.encrypt(data, key)
+    println(encrypted)
+    println(iv)
 
-    val archived = Archiver.zip(data.toByteArray())
-    println(archived.size)
-    println(String(archived))
-
-    val unarchived = Archiver.unzip(archived)
-    println(unarchived.size)
-    println(String(unarchived))
+    val decrypted = AESFactory.decrypt(encrypted, key, iv)
+    println(decrypted)
 }
