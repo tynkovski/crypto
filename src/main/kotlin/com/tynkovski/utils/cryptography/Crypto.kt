@@ -14,6 +14,7 @@ import javax.crypto.KeyGenerator
 object Crypto {
 
     object AES {
+
         private object Key {
             fun getInstance(byteArray: ByteArray): java.security.Key {
                 return SecretKeySpec(byteArray, KEY_ALGORITHM)
